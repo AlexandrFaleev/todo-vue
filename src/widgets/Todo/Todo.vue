@@ -1,7 +1,9 @@
 <script setup>
+import { provide, computed } from 'vue'
+import { useTodos } from '@/shared/hooks/useTodos';
+import { TODO_CONTEXT } from './todoContext'
 import { AddTaskForm, SearchTaskForm, TodoInfo } from '@/features';
 import { TodoList } from '@/entities';
-import { useTodos } from '@/shared/hooks/useTodos';
 import './Todo.scss';
 
 const {
@@ -16,6 +18,16 @@ toggleTask,
 deleteAll
 } = useTodos()
 
+const visibleTasks = computed(() => filteredTasks.value ?? tasks.value)
+
+provide(TODO_CONTEXT, {
+  tasks: visibleTasks,
+  stats,
+  deleteTask,
+  toggleTask,
+  deleteAll
+})
+
 </script>
 
 <template>
@@ -23,15 +35,7 @@ deleteAll
     <h1 class="todo__title">To Do List</h1>
     <AddTaskForm class="todo__form" v-model="newTaskTitle" @addTask="addTask"/>
     <SearchTaskForm class="todo__form" v-model="search" />
-    <TodoInfo
-      :stats="stats"
-      @deleteAll="deleteAll"
-    />
-    <TodoList
-      :tasks="filteredTasks ?? tasks"
-      :stats="stats"
-      @deleteTask="deleteTask"
-      @toggleTask="toggleTask"
-    />
+    <TodoInfo />
+    <TodoList />
   </div>
 </template>

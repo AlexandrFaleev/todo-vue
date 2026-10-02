@@ -1,16 +1,11 @@
 <script setup>
-defineProps({
-    tasks: {
-        type: Array,
-        required: false
-    },
-    stats: {
-        type: Object,
-        required: true
-    }
-})
-defineEmits(['deleteTask', 'toggleTask'])
-import TodoItem from '../TodoItem/TodoItem.vue';
+import {TodoItem} from '../TodoItem';
+import { useTodoContext } from '@/widgets/Todo/todoContext'
+
+const {
+    tasks,
+    stats
+} = useTodoContext()
 </script>
 
 <template>
@@ -18,8 +13,6 @@ import TodoItem from '../TodoItem/TodoItem.vue';
         <TodoItem
             v-for="task in tasks"
             :task="task"
-            @deleteTask="$emit('deleteTask', $event)"
-            @toggleTask="$emit('toggleTask', $event)"
         />
     </ul>
     <div class="todo__empty" v-if="stats.total === 0">

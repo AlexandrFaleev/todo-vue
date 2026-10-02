@@ -1,12 +1,16 @@
 <script setup>
+import CrossIcon from '@/shared/assets/icons/CrossIcon.vue';
+import { useTodoContext } from '@/widgets/Todo/todoContext'
 defineProps({
     task: {
         type: Object,
         required: true
     }
 })
-defineEmits(['deleteTask', 'toggleTask'])
-import CrossIcon from '@/shared/assets/icons/CrossIcon.vue';
+const {
+    deleteTask,
+    toggleTask
+} = useTodoContext()
 </script>
 
 <template>
@@ -16,10 +20,10 @@ import CrossIcon from '@/shared/assets/icons/CrossIcon.vue';
             class="todo-item__checkbox"
             type="checkbox"
             :checked="task.isDone"
-            @change="$emit('toggleTask', task.id)"
+            @change="toggleTask(task.id)"
         />
         <label :for="task.id" class="todo-item__title">{{ task.title }}</label>
-        <button type="button" class="todo-item__button" @click="$emit('deleteTask', task.id)">
+        <button type="button" class="todo-item__button" @click="deleteTask(task.id)">
             <CrossIcon />
         </button>
     </li>

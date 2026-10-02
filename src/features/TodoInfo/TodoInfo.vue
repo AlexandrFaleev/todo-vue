@@ -1,11 +1,7 @@
 <script setup>
-defineProps({
-    stats: {
-        type: Object,
-        required: true
-    }
-})
-defineEmits('deleteAll')
+import { useTodoContext } from '@/widgets/Todo/todoContext'
+
+const { stats, deleteAll } = useTodoContext()
 </script>
 
 <template>
@@ -13,7 +9,7 @@ defineEmits('deleteAll')
         <div class="todo__counter">
             Выполнено {{stats.done}} из {{stats.total}}
         </div>
-        <button type="button" class="todo__delete-all" v-if="stats.total > 0" @click="$emit('deleteAll')">
+        <button type="button" class="todo__delete-all" v-if="stats.total > 0" @click="deleteAll">
             Удалить все
         </button>
     </div>
