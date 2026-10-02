@@ -1,0 +1,24 @@
+@use "variables" as *;
+@use "mixins" as *;
+
+body {
+    @include flex-column;
+
+    align-items: center;
+    justify-content: start;
+    padding: 100px 50px;
+    background-color: $gray-100;
+    font-family: $font-main;
+}
+
+input,
+label,
+button {
+    transition: $transition;
+}
+
+:focus-visible {
+    outline: 2px dashed $black;
+    outline-offset: 4px;
+    transition-duration: 0s !important;
+}

@@ -1,0 +1,23 @@
+@use "@styles" as *;
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    background-color: $black;
+    border: $border;
+    border-color: $black;
+    border-radius: $border-radius;
+    color: $white;
+    font-size: 16px;
+
+    &:hover {
+        background-color: transparent;
+        color: $black;
+    }
+
+    &:active {
+        scale: 1.05;
+    }
+}

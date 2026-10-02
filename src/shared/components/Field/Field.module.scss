@@ -1,0 +1,36 @@
+@use "@styles" as *;
+
+.field {
+    position: relative;
+    width: 100%;
+
+    &:has(.field__input:not(:placeholder-shown)) .field__label {
+        scale: 0.85;
+        color: $black;
+        translate: -1.75em -2.5em;
+    }
+}
+
+.field__label {
+    position: absolute;
+    width: 200px;
+    top: 50%;
+    left: calc(1px + $input-padding-x);
+    translate: 0 -50%;
+    font-size: 16px;
+    color: $gray-500;
+}
+
+.field__input {
+    width: 100%;
+    height: $input-height;
+    padding-inline: $input-padding-x;
+    border: $border;
+    border-radius: $border-radius;
+    font-size: 16px;
+
+    &:focus {
+        background-color: $gray-200;
+        outline: none;
+    }
+}
