@@ -128,3 +128,33 @@
         }
     }
 }
+
+.loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 70px;
+    aspect-ratio: 1;
+    border: 3px $gray-200 solid;
+    border-radius: 50%;
+    align-self: center;
+
+    &::after {
+        content: '';
+        position: absolute;
+        margin: -3px;
+        inset: 0;
+        border: 3px transparent solid;
+        border-top-color: $black;
+        border-right-color: $black;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -5,11 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "json-server --watch db.json5 --port 3001",
+    "start": "concurrently \"npm run server\" and \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "concurrently": "^10.0.6",
+    "json": "^11.0.0",
+    "json-server": "^1.0.0-beta.15",
     "sass": "^1.105.1",
+    "server": "^1.0.42",
     "vue": "^3.5.42"
   },
   "devDependencies": {

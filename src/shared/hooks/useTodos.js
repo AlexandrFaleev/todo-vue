@@ -1,11 +1,22 @@
-import { computed, ref, watch } from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
+import {
+    getAllTasks,
+    deleteTask,
+    addTask,
+    changeTaskState,
+    deleteAll
+} from '@/shared/api/todosAPI.js'
 
 const STORAGE_KEY = 'TODO_LIST'
 
 export function useTodos() {
-    const tasks = ref(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'))
+    //const tasks = ref(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'))
+    const tasks = ref([])
     const newTaskTitle = ref('')
     const search = ref('')
+
+    const isLoading = ref(false)
+    const error = ref(null)
 
     const filteredTasks = computed(() => {
         return tasks.value.length > 0 && search.value.trim().length > 0
@@ -13,49 +24,126 @@ export function useTodos() {
             : null
     })
 
-    watch(tasks, (val) => {
-        if(val.length > 0) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(val))
-        } else {
-            localStorage.removeItem(STORAGE_KEY)
+    async function loadTodos() {
+        isLoading.value = true
+        error.value = null
+
+        try {
+            const data = await getAllTasks()
+
+            if(!Array.isArray(data)) {
+                throw new Error('API returned wrong todosList')
+            }
+
+            tasks.value = data
+        } catch (err) {
+            error.value = err instanceof Error
+                ? err.message
+                : 'Не удалось загрузить задачи'
+            console.error(`Failed to load tasks: ${err}`)
+        } finally {
+            isLoading.value = false
         }
-    }, {deep: true})
+    }
 
     const stats = computed(() => ({
         total: tasks.value.length,
-        done: tasks.value.filter(({isDone}) => isDone).length
+        done: tasks.value.filter(({completed}) => completed).length
     }))
 
-    function addTask() {
+    async function createTask() {
+        isLoading.value = true
+        error.value = null
+
         if(newTaskTitle.value.trim().length > 0) {
-            tasks.value = [...tasks.value, {
-                id: crypto?.randomUUID() ?? Date.now().toString(),
-                title: newTaskTitle.value.trim(),
-                isDone: false
-            }]
-            newTaskTitle.value = ''
+            try {
+                const data = await addTask({
+                    title: newTaskTitle.value.trim(),
+                    completed: false
+                })
+
+                if(!data) {
+                    throw new error ('Failed to create task')
+                }
+
+                tasks.value = [...tasks.value, {...data}]
+                newTaskTitle.value = ''
+            } catch (err) {
+                console.error(`Failed to create task: ${err}`)
+                error.value = err instanceof Error
+                    ? err.message
+                    : 'Не удалось загрузить задачи'
+            } finally {
+                isLoading.value = false
+            }
         }
     }
 
-    function deleteTask(taskId) {
+    async function deleteTaskItem(taskId) {
+        try {
+            const data = await deleteTask(taskId)
+            if(!data) {
+                throw new error('Failed to delete task item')
+            }
+
+            tasks.value = tasks.value.filter((id) => id !== taskId)
+        } catch (err) {
+            error.value = err instanceof Error
+            ? err.message
+                : 'Не удалось удалить задачу'
+        }
         tasks.value = tasks.value.filter(({id}) => id !== taskId)
     }
 
-    function toggleTask(taskId) {
-        tasks.value = tasks.value.map((task) => {
-            if(task.id === taskId) {
-                return {...task, isDone: !task.isDone}
+    async function toggleTask(taskId, completed) {
+        try {
+            const data = await changeTaskState(taskId, completed)
+
+            if(!data) {
+                throw new error('Failed to change task state')
             }
 
-            return task
-        })
+            tasks.value = tasks.value.map((task) => {
+                if(task.id === taskId) {
+                    return {...data}
+                }
+
+                return task
+            })
+        } catch (err) {
+            console.error(`Failed to toggle task: ${taskId}`)
+            error.value = err instanceof Error
+                ? err.message
+                : 'Не удалось поменять статус задачи'
+        }
     }
 
-    function deleteAll() {
-        if(confirm('Вы уверены, что хотите удалить все задачи?')) {
+    async function deleteAllTasks() {
+        if (!tasks.value.length) return
+
+        if (!globalThis.confirm('Вы уверены, что хотите удалить все задачи?')) {
+            return
+        }
+
+        isLoading.value = true
+        error.value = null
+
+        try {
+            await deleteAll(tasks.value)
+
             tasks.value = []
             newTaskTitle.value = ''
             search.value = ''
+        } catch (err) {
+            error.value = err instanceof Error
+                ? err.message
+                : 'Не удалось удалить все задачи'
+
+            console.error(err)
+
+            await loadTodos()
+        } finally {
+            isLoading.value = false
         }
     }
 
@@ -65,9 +153,12 @@ export function useTodos() {
         newTaskTitle,
         search,
         stats,
-        addTask,
-        deleteTask,
+        isLoading,
+        error,
+        loadTodos,
+        createTask,
+        deleteTaskItem,
         toggleTask,
-        deleteAll
+        deleteAllTasks
     }
 }

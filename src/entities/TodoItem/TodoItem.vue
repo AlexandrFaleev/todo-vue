@@ -8,8 +8,8 @@ defineProps({
     }
 })
 const {
-    deleteTask,
-    toggleTask
+  deleteTaskItem,
+  toggleTask
 } = useTodoContext()
 </script>
 
@@ -19,11 +19,11 @@ const {
             :id="task.id"
             class="todo-item__checkbox"
             type="checkbox"
-            :checked="task.isDone"
-            @change="toggleTask(task.id)"
+            :checked="task.completed"
+            @change="toggleTask(task.id, task.completed)"
         />
         <label :for="task.id" class="todo-item__title">{{ task.title }}</label>
-        <button type="button" class="todo-item__button" @click="deleteTask(task.id)">
+        <button type="button" class="todo-item__button" @click="deleteTaskItem(task.id)">
             <CrossIcon />
         </button>
     </li>

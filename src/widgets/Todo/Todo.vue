@@ -7,25 +7,31 @@ import { TodoList } from '@/entities';
 import './Todo.scss';
 
 const {
-tasks,
-filteredTasks,
-newTaskTitle,
-search,
-stats,
-addTask,
-deleteTask,
-toggleTask,
-deleteAll
+  tasks,
+  filteredTasks,
+  newTaskTitle,
+  search,
+  stats,
+  isLoading,
+  error,
+  loadTodos,
+  createTask,
+  deleteTaskItem,
+  toggleTask,
+  deleteAllTasks
 } = useTodos()
 
+loadTodos()
 const visibleTasks = computed(() => filteredTasks.value ?? tasks.value)
 
 provide(TODO_CONTEXT, {
   tasks: visibleTasks,
   stats,
-  deleteTask,
+  isLoading,
+  error,
+  deleteTaskItem,
   toggleTask,
-  deleteAll
+  deleteAllTasks
 })
 
 </script>
@@ -33,7 +39,7 @@ provide(TODO_CONTEXT, {
 <template>
   <div class="todo">
     <h1 class="todo__title">To Do List</h1>
-    <AddTaskForm class="todo__form" v-model="newTaskTitle" @addTask="addTask"/>
+    <AddTaskForm class="todo__form" v-model="newTaskTitle" @addTask="createTask"/>
     <SearchTaskForm class="todo__form" v-model="search" />
     <TodoInfo />
     <TodoList />
